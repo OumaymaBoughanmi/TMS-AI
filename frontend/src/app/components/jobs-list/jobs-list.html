@@ -1,0 +1,53 @@
+<app-dashboard-overview></app-dashboard-overview>
+<app-infrastructure-status></app-infrastructure-status>
+<section class="card">
+  <div class="card-header jobs-header">
+    <div>
+      <h3>Talend Jobs</h3>
+      <p class="card-subtitle">Live status of ETL job executions</p>
+    </div>
+    <div class="summary-chips">
+      <span class="chip chip-success">{{ countByStatus('SUCCESS') }} success</span>
+      <span class="chip chip-failed">{{ countByStatus('FAILED') }} failed</span>
+      <span class="chip chip-running">{{ countByStatus('RUNNING') }} running</span>
+    </div>
+  </div>
+
+  <input
+    type="text"
+    class="search-input jobs-search"
+    placeholder="Search by job name, server, or status..."
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="applyFilter()"
+    name="searchTerm"
+    autocomplete="off">
+
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>Job</th>
+        <th>Status</th>
+        <th>Server</th>
+        <th>Last run</th>
+        <th>Duration</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let job of filteredJobs" [ngClass]="getStatusClass(job.status)">
+        <td class="job-name">{{ job.name }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="getStatusClass(job.status)">
+            {{ job.status }}
+          </span>
+        </td>
+        <td class="text-muted">{{ job.server || '—' }}</td>
+        <td class="text-muted">{{ job.lastRunAt ? (job.lastRunAt | date:'short') : '—' }}</td>
+        <td class="text-muted">{{ job.duration ? job.duration + 's' : '—' }}</td>
+        <td class="text-muted error-cell">{{ job.errorMessage || '—' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="empty-state" *ngIf="filteredJobs.length === 0">No jobs found.</p>
+</section>

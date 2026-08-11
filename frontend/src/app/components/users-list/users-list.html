@@ -1,0 +1,50 @@
+<section class="card">
+  <div class="card-header users-header">
+    <h3>Users</h3>
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search by name or email..."
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="applyFilter()"
+      name="searchTerm"
+      autocomplete="off">
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="form-grid" autocomplete="off">
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" [(ngModel)]="newUser.fullName" name="fullName" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="newUser.email" name="email" required autocomplete="new-email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" [(ngModel)]="newUser.password" name="password" required autocomplete="new-password">
+    </div>
+    <button type="submit" class="btn-primary">Create User</button>
+  </form>
+
+  <div class="user-list">
+    <div class="user-row" *ngFor="let user of filteredUsers">
+      <div class="user-avatar">{{ user.fullName.charAt(0) }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ user.fullName }}</span>
+        <span class="user-email">{{ user.email }}</span>
+      </div>
+      <span class="user-role">{{ user.role }}</span>
+      <div class="user-actions">
+        <button class="btn-small" (click)="toggleRole(user)">
+          {{ user.role === 'admin' ? 'Demote' : 'Make Admin' }}
+        </button>
+        <button class="btn-small btn-danger" (click)="deleteUser(user)">
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <p class="empty-state" *ngIf="filteredUsers.length === 0">No users found.</p>
+  </div>
+</section>

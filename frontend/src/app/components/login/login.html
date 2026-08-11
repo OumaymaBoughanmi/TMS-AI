@@ -1,0 +1,45 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="brand-mark">TMS</span>
+      <span class="brand-name">AI Monitoring</span>
+    </div>
+
+    <h2>{{ isSignUpMode ? 'Create an account' : 'Sign in' }}</h2>
+    <p class="login-subtitle">Talend Monitoring System — BIAT</p>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="field" *ngIf="isSignUpMode">
+        <label>Full Name</label>
+        <input type="text" [(ngModel)]="fullName" name="fullName" required>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="email" name="email" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" [(ngModel)]="password" name="password" required>
+      </div>
+
+      <p class="info-message" *ngIf="infoMessage">{{ infoMessage }}</p>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+
+      <button type="submit" class="btn-primary btn-full">
+        {{ isSignUpMode ? 'Sign up' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="toggle-mode">
+      <ng-container *ngIf="!isSignUpMode">
+        Don't have an account? <a (click)="toggleMode()">Sign up</a>
+      </ng-container>
+      <ng-container *ngIf="isSignUpMode">
+        Already have an account? <a (click)="toggleMode()">Sign in</a>
+      </ng-container>
+    </p>
+  </div>
+</div>

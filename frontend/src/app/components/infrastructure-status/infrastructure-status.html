@@ -1,0 +1,18 @@
+<section class="card">
+  <div class="card-header">
+    <h3>Infrastructure Status</h3>
+    <p class="card-subtitle">Database and server availability</p>
+  </div>
+
+  <div class="infra-grid">
+    <div class="infra-tile" *ngFor="let check of checks" [ngClass]="check.status === 'UP' ? 'tile-up' : 'tile-down'">
+      <div class="infra-tile-header">
+        <span class="infra-dot"></span>
+        <span class="infra-name">{{ check.name }}</span>
+      </div>
+      <span class="infra-status">{{ check.status }}</span>
+      <span class="infra-time" *ngIf="check.checkedAt">{{ check.checkedAt | date:'short' }}</span>
+      <span class="infra-error" *ngIf="check.errorMessage">{{ check.errorMessage }}</span>
+    </div>
+  </div>
+</section>

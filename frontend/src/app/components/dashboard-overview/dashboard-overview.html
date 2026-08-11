@@ -1,0 +1,38 @@
+<div class="stats-grid" *ngIf="stats">
+  <div class="stat-card">
+    <span class="stat-label">Total Jobs</span>
+    <span class="stat-value">{{ stats.totalJobs }}</span>
+  </div>
+
+  <div class="stat-card">
+    <span class="stat-label">Success Rate</span>
+    <span class="stat-value" [ngClass]="stats.successRate >= 80 ? 'stat-good' : 'stat-warn'">
+      {{ stats.successRate }}%
+    </span>
+  </div>
+
+  <div class="stat-card">
+    <span class="stat-label">Open Incidents</span>
+    <span class="stat-value" [ngClass]="stats.openIncidents > 0 ? 'stat-bad' : 'stat-good'">
+      {{ stats.openIncidents }}
+    </span>
+  </div>
+
+  <div class="stat-card">
+    <span class="stat-label">MTTR (avg. resolution)</span>
+    <span class="stat-value">{{ stats.mttrMinutes }} min</span>
+  </div>
+</div>
+
+<div class="chart-card" *ngIf="chartData.length > 0">
+  <div class="chart-header">
+    <h3>Incidents — Last 7 Days</h3>
+  </div>
+  <div class="chart-bars">
+    <div class="chart-bar-wrapper" *ngFor="let point of chartData">
+      <div class="chart-bar-count">{{ point.count }}</div>
+      <div class="chart-bar" [style.height.%]="getBarHeight(point.count)"></div>
+      <div class="chart-bar-label">{{ formatDay(point.date) }}</div>
+    </div>
+  </div>
+</div>

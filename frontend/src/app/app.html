@@ -1,0 +1,47 @@
+<div class="layout" *ngIf="!isLoginPage">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark">TMS</span>
+      <span class="brand-name">AI Monitoring</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/jobs" routerLinkActive="active">
+        <span class="nav-dot"></span> Jobs Monitoring
+      </a>
+      <a class="nav-item" routerLink="/incidents" routerLinkActive="active">
+        <span class="nav-dot"></span> Incidents
+      </a>
+
+      <a class="nav-item" routerLink="/logs" routerLinkActive="active">
+        <span class="nav-dot"></span> Logs
+      </a>
+
+      <a class="nav-item" routerLink="/escalations" routerLinkActive="active">
+  <span class="nav-dot"></span> Escalations
+</a>
+
+      <a class="nav-item" routerLink="/users" routerLinkActive="active">
+        <span class="nav-dot"></span> Users
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">Log out</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main">
+    <header class="topbar">
+      <h2>Talend Monitoring System</h2>
+      <span class="topbar-subtitle">AI-powered supervision platform</span>
+    </header>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+
+<router-outlet *ngIf="isLoginPage"></router-outlet>

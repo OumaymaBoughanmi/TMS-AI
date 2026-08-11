@@ -1,0 +1,89 @@
+<section class="card">
+  <div class="card-header">
+    <h3>Incidents</h3>
+    <p class="card-subtitle">Automatically detected issues</p>
+  </div>
+
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Source</th>
+        <th>Severity</th>
+        <th>Status</th>
+        <th>Probable Cause</th>
+        <th>Detected</th>
+        <th>AI</th>
+        <th>Logs</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let incident of incidents">
+        <tr>
+          <td class="job-name">
+            {{ incident.title }}
+            <span class="escalated-flag" *ngIf="incident.escalated" title="Escalated">⚠️ Escalated</span>
+          </td>
+          <td class="text-muted">{{ incident.source }}</td>
+          <td>
+            <span class="badge" [ngClass]="getSeverityClass(incident.severity)">
+              {{ incident.severity }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getStatusClass(incident.status)">
+              {{ incident.status }}
+            </span>
+          </td>
+          <td class="text-muted cause-cell">{{ incident.probableCause || '—' }}</td>
+          <td class="text-muted">{{ incident.createdAt | date:'short' }}</td>
+          <td>
+            <button class="btn-ai" (click)="toggleExpand(incident.id!)" *ngIf="incident.aiSuggestion">
+              🤖 {{ expandedIncidentId === incident.id ? 'Hide' : 'View' }}
+            </button>
+            <span class="text-muted" *ngIf="!incident.aiSuggestion">—</span>
+          </td>
+          <td>
+            <button class="btn-ai" (click)="toggleLogs(incident.id!)">
+              📋 {{ showingLogsFor === incident.id ? 'Hide' : 'Logs' }}
+            </button>
+          </td>
+          <td>
+            <button
+              *ngIf="incident.status !== 'RESOLVED'"
+              class="btn-resolve"
+              (click)="resolve(incident.id!)">
+              Resolve
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="expandedIncidentId === incident.id" class="ai-row">
+          <td colspan="9">
+            <div class="ai-panel">
+              <strong>🤖 AI Suggestion:</strong>
+              <p>{{ incident.aiSuggestion }}</p>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="showingLogsFor === incident.id" class="ai-row">
+          <td colspan="9">
+            <div class="ai-panel">
+              <strong>📋 Related Logs:</strong>
+              <div class="related-log-line" *ngFor="let log of relatedLogs[incident.id]">
+                <span class="badge" [ngClass]="'level-' + log.level.toLowerCase()">{{ log.level }}</span>
+                <span class="log-message">{{ log.message }}</span>
+                <span class="log-time">{{ log.timestamp | date:'short' }}</span>
+              </div>
+              <p *ngIf="relatedLogs[incident.id] && relatedLogs[incident.id].length === 0" class="text-muted">
+                No related logs found.
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <p class="empty-state" *ngIf="incidents.length === 0">No incidents detected.</p>
+</section>

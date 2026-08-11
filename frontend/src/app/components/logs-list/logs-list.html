@@ -1,0 +1,38 @@
+<section class="card">
+  <div class="card-header">
+    <h3>System Logs</h3>
+    <p class="card-subtitle">Live activity log from Jobs and Infrastructure checks</p>
+  </div>
+
+  <input
+    type="text"
+    class="search-input jobs-search"
+    placeholder="Search logs by message..."
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="loadLogs()"
+    name="searchTerm"
+    autocomplete="off">
+
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>Level</th>
+        <th>Source</th>
+        <th>Message</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td>
+          <span class="badge" [ngClass]="getLevelClass(log.level)">{{ log.level }}</span>
+        </td>
+        <td class="text-muted">{{ log.source }}</td>
+        <td>{{ log.message }}</td>
+        <td class="text-muted">{{ log.timestamp | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="empty-state" *ngIf="logs.length === 0">No logs found.</p>
+</section>

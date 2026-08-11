@@ -1,0 +1,58 @@
+.jobs-search {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13.5px;
+  padding: 20px 0;
+}
+
+.jobs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.summary-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+.chip-success { background: var(--color-success-bg); color: var(--color-success); }
+.chip-failed { background: var(--color-danger-bg); color: var(--color-danger); }
+.chip-running { background: var(--color-warning-bg); color: var(--color-warning); }
+
+.error-cell {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+
+.status-badge.status-success { background: var(--color-success-bg); color: var(--color-success); }
+.status-badge.status-failed { background: var(--color-danger-bg); color: var(--color-danger); }
+.status-badge.status-running { background: var(--color-warning-bg); color: var(--color-warning); }

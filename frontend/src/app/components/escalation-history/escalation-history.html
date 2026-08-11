@@ -1,0 +1,39 @@
+<section class="card">
+  <div class="card-header">
+    <h3>Escalation History</h3>
+    <p class="card-subtitle">Audit trail of incidents that required escalation</p>
+  </div>
+
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>Incident</th>
+        <th>Severity</th>
+        <th>Open For</th>
+        <th>Escalated To</th>
+        <th>Escalated At</th>
+        <th>Current Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of escalationLogs">
+        <td class="job-name">{{ log.incidentTitle }}</td>
+        <td>
+          <span class="badge" [ngClass]="getSeverityClass(log.severity)">
+            {{ log.severity }}
+          </span>
+        </td>
+        <td class="text-muted">{{ log.minutesOpen }} min</td>
+        <td class="text-muted">{{ log.escalatedTo }}</td>
+        <td class="text-muted">{{ log.escalatedAt | date:'short' }}</td>
+        <td>
+          <span class="badge" [ngClass]="getStatusClass(getIncidentStatus(log.incidentId))">
+            {{ getIncidentStatus(log.incidentId) }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="empty-state" *ngIf="escalationLogs.length === 0">No escalations yet.</p>
+</section>
