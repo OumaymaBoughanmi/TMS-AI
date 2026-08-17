@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 import { UpdateIncidentDto } from './dto/update-incident.dto';
-import { Incident, IncidentStatus } from './entities/incident.entity';
+import { Incident, IncidentStatus, IncidentSeverity } from './entities/incident.entity';
 import { Infrastructure, CheckType, CheckStatus } from '../infrastructure/entities/infrastructure.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -93,8 +93,26 @@ export class IncidentsService {
       description: data.description,
     });
 
+    const aiSeverityRaw = await this.aiService.classifySeverity({
+      title: data.title,
+      source: data.source,
+      description: data.description,
+    });
+
+    const aiSeverity = IncidentSeverity[aiSeverityRaw as keyof typeof IncidentSeverity];
+
+    // Re-check right before saving, in case another cron cycle created one while AI was thinking
+    const stillNotExists = await this.incidentRepository.findOne({
+      where: { title: data.title, status: IncidentStatus.OPEN },
+    });
+
+    if (stillNotExists) {
+      return stillNotExists;
+    }
+
     const incident = this.incidentRepository.create({
       ...data,
+      severity: aiSeverity,
       probableCause,
       aiSuggestion,
     });

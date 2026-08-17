@@ -15,6 +15,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { EscalationLogsModule } from './escalation-logs/escalation-logs.module';
 import { AiModule } from './ai/ai.module';
 import { LogsModule } from './logs/logs.module';
+import { ChatbotModule } from './chatbot/chatbot.module';
+import { ChatConversationsModule } from './chat-conversations/chat-conversations.module';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { LogsModule } from './logs/logs.module';
     EscalationLogsModule,
     AiModule,
     LogsModule,
+    ChatbotModule,
+    ChatConversationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

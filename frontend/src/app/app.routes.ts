@@ -6,6 +6,7 @@ import { Login } from './components/login/login';
 import { LogsList } from './components/logs-list/logs-list';
 import { EscalationHistory } from './components/escalation-history/escalation-history';
 import { authGuard } from './guards/auth-guard';
+import { Chatbot } from './components/chatbot/chatbot';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,4 +16,5 @@ export const routes: Routes = [
   { path: 'incidents', component: IncidentsList, canActivate: [authGuard] },
   { path: 'logs', component: LogsList, canActivate: [authGuard] },
   { path: 'escalations', component: EscalationHistory, canActivate: [authGuard] },
+  { path: 'assistant', component: Chatbot, canActivate: [authGuard] },
 ];

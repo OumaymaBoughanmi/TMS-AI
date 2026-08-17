@@ -1,0 +1,57 @@
+<div class="chat-layout">
+  <!-- Conversation sidebar -->
+  <aside class="chat-sidebar">
+    <button class="btn-new-chat" (click)="startNewConversation()">+ New conversation</button>
+
+    <div class="conversation-list">
+      <div
+        *ngFor="let conv of conversations"
+        class="conversation-item"
+        [ngClass]="{ active: activeConversation?.id === conv.id }"
+        (click)="selectConversation(conv)">
+        <span class="conversation-title">{{ conv.title }}</span>
+        <button class="btn-delete-conv" (click)="deleteConversation(conv, $event)" title="Delete">×</button>
+      </div>
+
+      <p class="empty-state" *ngIf="conversations.length === 0">No conversations yet.</p>
+    </div>
+  </aside>
+
+  <!-- Chat area -->
+  <section class="card chat-card">
+    <div class="card-header">
+      <h3>AI Assistant</h3>
+      <p class="card-subtitle">Ask about jobs, incidents, infrastructure, or general IT topics</p>
+    </div>
+
+    <div class="chat-messages" *ngIf="activeConversation">
+      <div
+        *ngFor="let msg of activeConversation.messages"
+        class="chat-message"
+        [ngClass]="msg.role === 'user' ? 'chat-user' : 'chat-assistant'">
+        <div class="chat-avatar">{{ msg.role === 'user' ? '🧑' : '🤖' }}</div>
+        <div class="chat-bubble">{{ msg.text }}</div>
+      </div>
+
+      <div *ngIf="isLoading" class="chat-message chat-assistant">
+        <div class="chat-avatar">🤖</div>
+        <div class="chat-bubble chat-typing">Thinking...</div>
+      </div>
+
+      <p class="empty-state" *ngIf="activeConversation.messages.length === 0">
+        Start the conversation by asking a question below.
+      </p>
+    </div>
+
+    <form (ngSubmit)="sendMessage()" class="chat-input-row">
+      <input
+        type="text"
+        [(ngModel)]="currentQuestion"
+        name="question"
+        placeholder="Ask a question..."
+        autocomplete="off"
+        [disabled]="isLoading">
+      <button type="submit" class="btn-primary" [disabled]="isLoading">Send</button>
+    </form>
+  </section>
+</div>

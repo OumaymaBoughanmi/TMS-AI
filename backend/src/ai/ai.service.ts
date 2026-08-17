@@ -52,6 +52,61 @@ In 2-3 short sentences, explain the likely cause and suggest one concrete, gener
     }
   }
 
+  async classifySeverity(incident: {
+    title: string;
+    source: string;
+    description?: string;
+  }): Promise<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'> {
+    const sourceContext = this.getSourceContext(incident.source);
+
+    const prompt = `You are an IT incident severity classifier for a bank's monitoring system.
+
+Incident details:
+- Type: ${incident.source} (${sourceContext})
+- Title: ${incident.title}
+- Error message: ${incident.description || 'No error message provided'}
+
+Classify this incident's severity using ONLY ONE of these exact words: LOW, MEDIUM, HIGH, CRITICAL
+
+Guidelines:
+- CRITICAL: total service outage, database or core infrastructure completely unreachable, affects all downstream systems
+- HIGH: a job handling important data failed (e.g. customer, financial, or order data), or a server is down
+- MEDIUM: a non-critical job failed, or a recoverable/intermittent issue
+- LOW: minor, cosmetic, or low-impact issue with no real business effect
+
+Respond with ONLY the single word (LOW, MEDIUM, HIGH, or CRITICAL). No explanation, no punctuation, nothing else.`;
+
+    try {
+      const response = await fetch(this.ollamaUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'llama3.2',
+          prompt,
+          stream: false,
+          options: {
+            temperature: 0.1,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ollama error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const raw = data.response.trim().toUpperCase();
+
+      const validLevels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+      const found = validLevels.find((level) => raw.includes(level));
+
+      return (found as any) || 'MEDIUM';
+    } catch (error) {
+      console.error('AI severity classification failed:', error.message);
+      return 'MEDIUM';
+    }
+  }
+
   private getSourceContext(source: string): string {
     switch (source) {
       case 'SERVER':
