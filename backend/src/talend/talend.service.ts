@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { TalendConfigService } from '../talend-config/talend-config.service';
 
 export interface TalendTask {
   id: string;
@@ -9,7 +9,7 @@ export interface TalendTask {
 export interface TalendExecution {
   id: string;
   executableId: string;
-  status: string; // e.g. RUNNING, FINISHED, FAILED
+  status: string;
   startTimestamp?: number;
   endTimestamp?: number;
   errorMessage?: string;
@@ -17,49 +17,45 @@ export interface TalendExecution {
 
 @Injectable()
 export class TalendService {
-  private baseUrl: string;
-  private token: string;
+  constructor(private talendConfigService: TalendConfigService) {}
 
-  constructor(private configService: ConfigService) {
-    // Example EU URL — change region if needed (US / EU / AP)
-    this.baseUrl = this.configService.get('TALEND_API_URL') || '';
-    this.token = this.configService.get('TALEND_API_TOKEN') || '';
-  }
-
-  private get headers() {
+  private async getHeaders() {
+    const config = await this.talendConfigService.getActiveConfig();
+    if (!config) {
+      throw new Error('Talend API is not configured yet. Please set it up in Settings.');
+    }
     return {
-      Authorization: `Bearer ${this.token}`,
-      'Content-Type': 'application/json',
+      headers: {
+        Authorization: `Bearer ${config.apiToken}`,
+        'Content-Type': 'application/json',
+      },
+      baseUrl: config.apiUrl,
     };
   }
 
-  // 1. Get the list of tasks (jobs) defined in Talend
   async getTasks(): Promise<TalendTask[]> {
-    const response = await fetch(`${this.baseUrl}/executables/tasks`, {
-      headers: this.headers,
-    });
+    const { headers, baseUrl } = await this.getHeaders();
+    const response = await fetch(`${baseUrl}/executables/tasks`, { headers });
     if (!response.ok) {
       throw new Error(`Talend API error: ${response.status}`);
     }
     return response.json();
   }
 
-  // 2. Get the status of a specific execution
   async getExecutionStatus(executionId: string): Promise<TalendExecution> {
-    const response = await fetch(`${this.baseUrl}/executions/${executionId}`, {
-      headers: this.headers,
-    });
+    const { headers, baseUrl } = await this.getHeaders();
+    const response = await fetch(`${baseUrl}/executions/${executionId}`, { headers });
     if (!response.ok) {
       throw new Error(`Talend API error: ${response.status}`);
     }
     return response.json();
   }
 
-  // 3. Trigger a task execution
   async runTask(taskId: string): Promise<TalendExecution> {
-    const response = await fetch(`${this.baseUrl}/executions`, {
+    const { headers, baseUrl } = await this.getHeaders();
+    const response = await fetch(`${baseUrl}/executions`, {
       method: 'POST',
-      headers: this.headers,
+      headers,
       body: JSON.stringify({ executable: taskId }),
     });
     if (!response.ok) {

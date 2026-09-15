@@ -1,0 +1,39 @@
+<section class="card">
+  <div class="card-header">
+    <h3>Paramètres Talend</h3>
+    <p class="card-subtitle">Connectez votre propre compte Talend Cloud à cette plateforme</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="talend-form">
+    <div class="field">
+      <label>URL de l'API Talend</label>
+      <input
+        type="text"
+        [(ngModel)]="apiUrl"
+        name="apiUrl"
+        placeholder="https://api.fr.cloud.talend.com/tmc/v2.6"
+        required
+        autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label>Token d'accès (Access Token)</label>
+      <input
+        type="password"
+        [(ngModel)]="apiToken"
+        name="apiToken"
+        placeholder="Votre token personnel Talend Cloud"
+        required
+        autocomplete="new-password">
+    </div>
+
+    <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <button type="submit" class="btn-primary">Enregistrer la configuration</button>
+  </form>
+
+  <div class="status-badge" [ngClass]="isConfigured ? 'status-ok' : 'status-missing'">
+    {{ isConfigured ? '✓ Connexion configurée' : '✗ Aucune configuration active' }}
+  </div>
+</section>

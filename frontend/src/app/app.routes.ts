@@ -7,6 +7,7 @@ import { LogsList } from './components/logs-list/logs-list';
 import { EscalationHistory } from './components/escalation-history/escalation-history';
 import { authGuard } from './guards/auth-guard';
 import { Chatbot } from './components/chatbot/chatbot';
+import { TalendSettings } from './components/talend-settings/talend-settings';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,4 +18,5 @@ export const routes: Routes = [
   { path: 'logs', component: LogsList, canActivate: [authGuard] },
   { path: 'escalations', component: EscalationHistory, canActivate: [authGuard] },
   { path: 'assistant', component: Chatbot, canActivate: [authGuard] },
+  { path: 'talend-settings', component: TalendSettings, canActivate: [authGuard] },
 ];

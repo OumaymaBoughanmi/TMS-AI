@@ -17,6 +17,7 @@ import { AiModule } from './ai/ai.module';
 import { LogsModule } from './logs/logs.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
 import { ChatConversationsModule } from './chat-conversations/chat-conversations.module';
+import { TalendConfigModule } from './talend-config/talend-config.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ChatConversationsModule } from './chat-conversations/chat-conversations
     LogsModule,
     ChatbotModule,
     ChatConversationsModule,
+    TalendConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],
