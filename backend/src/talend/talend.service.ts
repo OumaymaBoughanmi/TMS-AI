@@ -39,7 +39,9 @@ export class TalendService {
     if (!response.ok) {
       throw new Error(`Talend API error: ${response.status}`);
     }
-    return response.json();
+    const data: any = await response.json();
+    // Talend wraps the list in an "items" field: { items: [...], total: N }
+    return Array.isArray(data) ? data : (data.items ?? []);
   }
 
   async getExecutionStatus(executionId: string): Promise<TalendExecution> {
@@ -60,6 +62,19 @@ export class TalendService {
     });
     if (!response.ok) {
       throw new Error(`Talend API error: ${response.status}`);
+    }
+    return response.json();
+  }
+
+  // Audit logs live at the host root (/security/audit/logs), not under /tmc/v2.6
+  async getAuditLogs(): Promise<any> {
+    const { headers, baseUrl } = await this.getHeaders();
+    const host = new URL(baseUrl).origin;
+    const url = `${host}/security/audit/logs`;
+    const response = await fetch(url, { headers });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Talend audit logs API error: ${response.status} on ${url} — ${body}`);
     }
     return response.json();
   }

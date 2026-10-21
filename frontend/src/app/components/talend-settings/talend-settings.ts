@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TalendConfigService } from '../../services/talend-config';
+import { TalendConfigService, TestResult } from '../../services/talend-config';
 
 @Component({
   selector: 'app-talend-settings',
@@ -15,6 +15,8 @@ export class TalendSettings implements OnInit {
   isConfigured = false;
   successMessage = '';
   errorMessage = '';
+  isTesting = false;
+  testResult: TestResult | null = null;
 
   constructor(private talendConfigService: TalendConfigService) {}
 
@@ -33,6 +35,22 @@ export class TalendSettings implements OnInit {
       },
       error: () => {
         this.isConfigured = false;
+      }
+    });
+  }
+
+  testConnection() {
+    this.testResult = null;
+    this.isTesting = true;
+
+    this.talendConfigService.testConnection({ apiUrl: this.apiUrl, apiToken: this.apiToken }).subscribe({
+      next: (result) => {
+        this.testResult = result;
+        this.isTesting = false;
+      },
+      error: () => {
+        this.testResult = { ok: false, message: "Impossible de lancer le test (êtes-vous connecté en tant qu'admin ?)." };
+        this.isTesting = false;
       }
     });
   }

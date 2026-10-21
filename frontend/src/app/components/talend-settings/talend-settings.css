@@ -18,6 +18,52 @@
   margin: 0;
 }
 
+.button-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--color-navy-dark);
+  border: 1px solid var(--color-border);
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  height: 38px;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-bg);
+  border-color: var(--color-navy-light);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.test-result {
+  font-size: 13px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+
+.test-ok {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.test-fail {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
 .status-badge {
   display: inline-block;
   font-size: 12.5px;

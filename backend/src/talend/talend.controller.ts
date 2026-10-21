@@ -11,4 +11,9 @@ export class TalendController {
   getTasks() {
     return this.talendService.getTasks();
   }
+
+  @Get('audit-logs')
+  getAuditLogs() {
+    return this.talendService.getAuditLogs();
+  }
 }

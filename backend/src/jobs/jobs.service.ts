@@ -1,14 +1,23 @@
-import { IncidentsService } from '../incidents/incidents.service';
-import { IncidentSource, IncidentSeverity } from '../incidents/entities/incident.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
-import { Job } from './entities/job.entity';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Job, JobStatus } from './entities/job.entity';
+import { IncidentsService } from '../incidents/incidents.service';
+import { IncidentSource, IncidentSeverity } from '../incidents/entities/incident.entity';
 import { LogsService } from '../logs/logs.service';
 import { TalendService } from '../talend/talend.service';
+
+interface PolledJob {
+  name: string;
+  status: string;
+  duration?: number;
+  errorMessage?: string;
+  server?: string;
+  statusKnown: boolean;
+}
 
 @Injectable()
 export class JobsService {
@@ -19,6 +28,7 @@ export class JobsService {
     private logsService: LogsService,
     private talendService: TalendService,
   ) {}
+
   create(createJobDto: CreateJobDto) {
     const job = this.jobRepository.create(createJobDto);
     return this.jobRepository.save(job);
@@ -44,22 +54,21 @@ export class JobsService {
   }
 
   @Cron(CronExpression.EVERY_MINUTE)
-   async pollTalend() {
-    let jobsToProcess: { name: string; status: string; duration?: number; errorMessage?: string; server?: string }[] = [];
+  async pollTalend() {
+    let jobsToProcess: PolledJob[] = [];
 
     try {
-      // Try the real Talend API first
       const realTasks = await this.talendService.getTasks();
 
-      if (realTasks && realTasks.length > 0) {
+      if (realTasks.length > 0) {
         console.log(`Polling Talend (REAL) — found ${realTasks.length} task(s)...`);
-        // NOTE: real Talend tasks don't include status directly here — this is a simplified mapping
         jobsToProcess = realTasks.map((task) => ({
-          name: task.name,
-          status: 'SUCCESS', // simplified — real status would need a second call per task
+          name: task.name || task.id || 'Unnamed Talend task',
+          status: 'SUCCESS', // placeholder: reading the real run status needs a second API call
+          statusKnown: false,
         }));
       } else {
-        console.log('Polling Talend (REAL) — no real tasks found, falling back to simulated data...');
+        console.log('Polling Talend (REAL) — no tasks found, falling back to simulated data...');
         jobsToProcess = this.getFakeTalendResponse();
       }
     } catch (error) {
@@ -68,30 +77,49 @@ export class JobsService {
     }
 
     for (const item of jobsToProcess) {
+      const { statusKnown, ...jobFields } = item;
       const existing = await this.jobRepository.findOneBy({ name: item.name });
 
-      if (existing) {
-        await this.jobRepository.update(existing.id, {
-          status: item.status as any,
-          duration: item.duration,
-          errorMessage: item.errorMessage || undefined,
-          server: item.server,
-          lastRunAt: new Date(),
-        });
-      } else {
-        const newJob = this.jobRepository.create({
-          ...item,
-          status: item.status as any,
-          lastRunAt: new Date(),
-        });
-        await this.jobRepository.save(newJob);
-      }
+      if (statusKnown) {
+        if (existing) {
+          await this.jobRepository.update(existing.id, {
+            status: item.status as any,
+            duration: item.duration,
+            errorMessage: item.errorMessage || undefined,
+            server: item.server,
+            lastRunAt: new Date(),
+          });
+        } else {
+          const newJob = this.jobRepository.create({
+            ...jobFields,
+            status: item.status as any,
+            lastRunAt: new Date(),
+          });
+          await this.jobRepository.save(newJob);
+        }
 
-      await this.logsService.log(
-        item.status === 'FAILED' ? 'ERROR' : 'INFO',
-        'JOB',
-        `Job "${item.name}" reported status ${item.status}${item.errorMessage ? ' — ' + item.errorMessage : ''}`,
-      );
+        await this.logsService.log(
+          item.status === 'FAILED' ? 'ERROR' : 'INFO',
+          'JOB',
+          `Job "${item.name}" reported status ${item.status}${item.errorMessage ? ' — ' + item.errorMessage : ''}`,
+        );
+      } else {
+        // Real Talend task whose run status we do not read yet:
+        // only register its name, without inventing a status or a run time in the logs.
+        if (!existing) {
+          const newJob = this.jobRepository.create({
+            name: item.name,
+            status: JobStatus.SUCCESS,
+          });
+          await this.jobRepository.save(newJob);
+        }
+
+        await this.logsService.log(
+          'INFO',
+          'JOB',
+          `Job "${item.name}" found in Talend (run status not read yet)`,
+        );
+      }
 
       if (item.status === 'FAILED') {
         await this.incidentsService.createIfNotExists({
@@ -105,10 +133,10 @@ export class JobsService {
     }
   }
 
-  private getFakeTalendResponse() {
+  private getFakeTalendResponse(): PolledJob[] {
     return [
-      { name: 'ETL_Load_Customers', status: 'SUCCESS', duration: 30, server: 'srv-etl-01' },
-      { name: 'ETL_Load_Orders', status: 'FAILED', duration: 8, errorMessage: 'Network timeout', server: 'srv-etl-02' },
+      { name: 'ETL_Load_Customers', status: 'SUCCESS', duration: 30, server: 'srv-etl-01', statusKnown: true },
+      { name: 'ETL_Load_Orders', status: 'FAILED', duration: 8, errorMessage: 'Network timeout', server: 'srv-etl-02', statusKnown: true },
     ];
   }
 }

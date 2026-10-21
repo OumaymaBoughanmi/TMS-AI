@@ -8,15 +8,16 @@ import { EscalationHistory } from './components/escalation-history/escalation-hi
 import { authGuard } from './guards/auth-guard';
 import { Chatbot } from './components/chatbot/chatbot';
 import { TalendSettings } from './components/talend-settings/talend-settings';
+import { adminGuard } from './guards/admin-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'jobs', component: JobsList, canActivate: [authGuard] },
-  { path: 'users', component: UsersList, canActivate: [authGuard] },
+  { path: 'users', component: UsersList, canActivate: [authGuard, adminGuard] },
   { path: 'incidents', component: IncidentsList, canActivate: [authGuard] },
   { path: 'logs', component: LogsList, canActivate: [authGuard] },
   { path: 'escalations', component: EscalationHistory, canActivate: [authGuard] },
   { path: 'assistant', component: Chatbot, canActivate: [authGuard] },
-  { path: 'talend-settings', component: TalendSettings, canActivate: [authGuard] },
+  { path: 'talend-settings', component: TalendSettings, canActivate: [authGuard, adminGuard] },
 ];

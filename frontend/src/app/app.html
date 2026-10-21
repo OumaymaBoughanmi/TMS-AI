@@ -12,27 +12,19 @@
       <a class="nav-item" routerLink="/incidents" routerLinkActive="active">
         <span class="nav-dot"></span> Incidents
       </a>
-
       <a class="nav-item" routerLink="/logs" routerLinkActive="active">
         <span class="nav-dot"></span> Logs
       </a>
-
       <a class="nav-item" routerLink="/escalations" routerLinkActive="active">
-  <span class="nav-dot"></span> Escalations
-
-  </a>
-
-  <a class="nav-item" routerLink="/assistant" routerLinkActive="active">
-  <span class="nav-dot"></span> AI Assistant
-</a>
-
-<a class="nav-item" routerLink="/talend-settings" routerLinkActive="active">
-  <span class="nav-dot"></span> Talend Settings
-</a>
-
-
-
-      <a class="nav-item" routerLink="/users" routerLinkActive="active">
+        <span class="nav-dot"></span> Escalations
+      </a>
+      <a class="nav-item" routerLink="/assistant" routerLinkActive="active">
+        <span class="nav-dot"></span> AI Assistant
+      </a>
+      <a class="nav-item" *ngIf="isAdmin" routerLink="/talend-settings" routerLinkActive="active">
+        <span class="nav-dot"></span> Talend Settings
+      </a>
+      <a class="nav-item" *ngIf="isAdmin" routerLink="/users" routerLinkActive="active">
         <span class="nav-dot"></span> Users
       </a>
     </nav>

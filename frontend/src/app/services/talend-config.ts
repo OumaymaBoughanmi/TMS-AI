@@ -10,6 +10,11 @@ export interface TalendConfig {
   updatedAt?: string;
 }
 
+export interface TestResult {
+  ok: boolean;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,5 +29,9 @@ export class TalendConfigService {
 
   saveConfig(config: { apiUrl: string; apiToken: string }): Observable<TalendConfig> {
     return this.http.post<TalendConfig>(this.apiUrl, config);
+  }
+
+  testConnection(config: { apiUrl: string; apiToken: string }): Observable<TestResult> {
+    return this.http.post<TestResult>(`${this.apiUrl}/test`, config);
   }
 }

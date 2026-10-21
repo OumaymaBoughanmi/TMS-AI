@@ -34,6 +34,10 @@ export class App {
       });
   }
 
+  get isAdmin(): boolean {
+    return this.authService.getUser()?.role === 'admin';
+  }
+
   logout() {
     this.inactivityService.stop();
     this.authService.logout();

@@ -30,7 +30,20 @@
     <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
     <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-    <button type="submit" class="btn-primary">Enregistrer la configuration</button>
+    <div class="button-row">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="testConnection()"
+        [disabled]="isTesting || !apiUrl || !apiToken">
+        {{ isTesting ? 'Test en cours...' : 'Tester la connexion' }}
+      </button>
+      <button type="submit" class="btn-primary">Enregistrer la configuration</button>
+    </div>
+
+    <p class="test-result" *ngIf="testResult" [ngClass]="testResult.ok ? 'test-ok' : 'test-fail'">
+      {{ testResult.ok ? '✓' : '✗' }} {{ testResult.message }}
+    </p>
   </form>
 
   <div class="status-badge" [ngClass]="isConfigured ? 'status-ok' : 'status-missing'">
